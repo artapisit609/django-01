@@ -1,0 +1,114 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-cube"></i> ระบบจัดการ 3D Printer - Raise 3D Pro3</h1>
+        <p class="lead">ระบบจัดการคิวงานพิมพ์ 3D และคำนวณต้นทุน</p>
+    </div>
+</div>
+
+<!-- สถิติ -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-tasks"></i> งานทั้งหมด</h5>
+                <h2>{{ total_jobs }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-clock"></i> รอดำเนินการ</h5>
+                <h2>{{ pending_jobs }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-print"></i> กำลังพิมพ์</h5>
+                <h2>{{ printing_jobs }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-check"></i> เสร็จสิ้น</h5>
+                <h2>{{ completed_jobs }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- คิวงานที่รอ -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5><i class="fas fa-list"></i> คิวงานที่รอดำเนินการ</h5>
+            </div>
+            <div class="card-body">
+                {% if waiting_jobs %}
+                    {% for job in waiting_jobs %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <strong>{{ job.job_name }}</strong>
+                        <br>
+                        <small class="text-muted">
+                            {{ job.department }} | {{ job.requestor }} | 
+                            ต้องการ: {{ job.date_needed }}
+                            {% if job.priority == 'urgent' %}
+                                <span class="badge bg-danger">เร่งด่วน</span>
+                            {% elif job.priority == 'high' %}
+                                <span class="badge bg-warning">สูง</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endfor %}
+                    <a href="{% url 'job_list' %}" class="btn btn-sm btn-outline-primary">ดูทั้งหมด</a>
+                {% else %}
+                    <p class="text-muted">ไม่มีงานที่รอดำเนินการ</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- งานที่เสร็จล่าสุด -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-check-circle"></i> งานที่เสร็จล่าสุด</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_completed %}
+                    {% for job in recent_completed %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <strong>{{ job.job_name }}</strong>
+                        <br>
+                        <small class="text-muted">
+                            {{ job.department }} | เสร็จเมื่อ: {{ job.date_completed|date:"d/m/Y H:i" }}
+                            {% if job.total_cost %}
+                                | ต้นทุน: ฿{{ job.total_cost }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">ยังไม่มีงานที่เสร็จสิ้น</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'add_job' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus"></i> เพิ่มงานใหม่
+        </a>
+    </div>
+</div>
+{% endblock %}

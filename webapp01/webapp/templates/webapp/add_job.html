@@ -1,0 +1,107 @@
+{% extends 'webapp/base.html' %}
+
+{% block title %}เพิ่มงานพิมพ์ 3D{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-plus"></i> เพิ่มงานพิมพ์ 3D ใหม่</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.job_name.id_for_label }}" class="form-label">ชื่องาน *</label>
+                                {{ form.job_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.requestor.id_for_label }}" class="form-label">ผู้ขอ *</label>
+                                {{ form.requestor }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.department.id_for_label }}" class="form-label">แผนก *</label>
+                                {{ form.department }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">ลำดับความสำคัญ *</label>
+                                {{ form.priority }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">รายละเอียดงาน</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.date_needed.id_for_label }}" class="form-label">วันที่ต้องการ *</label>
+                                {{ form.date_needed }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.material_type.id_for_label }}" class="form-label">ชนิดวัสดุ</label>
+                                {{ form.material_type }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.print_time_hours.id_for_label }}" class="form-label">เวลาพิมพ์ (ชั่วโมง) *</label>
+                                {{ form.print_time_hours }}
+                                <div class="form-text">ประมาณการเวลาในการพิมพ์</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.material_weight_grams.id_for_label }}" class="form-label">น้ำหนักวัสดุ (กรัม) *</label>
+                                {{ form.material_weight_grams }}
+                                <div class="form-text">น้ำหนักวัสดุที่ใช้ในการพิมพ์</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.file_upload.id_for_label }}" class="form-label">ไฟล์งาน (STL/3MF)</label>
+                        {{ form.file_upload }}
+                        <div class="form-text">อัปโหลดไฟล์ 3D สำหรับงานพิมพ์</div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>การคำนวณต้นทุน:</strong> ระบบจะคำนวณต้นทุนอัตโนมัติจาก เวลาพิมพ์ + น้ำหนักวัสดุ + ค่าไฟ + ค่าแรง
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> ยกเลิก
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> บันทึกงาน
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

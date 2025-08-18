@@ -1,0 +1,185 @@
+{% extends 'webapp/base.html' %}
+
+{% block title %}{{ job.job_name }} - รายละเอียดงาน{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-cube"></i> {{ job.job_name }}</h2>
+    <a href="{% url 'job_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> กลับ
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>รายละเอียดงาน</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>ชื่องาน:</strong></td>
+                                <td>{{ job.job_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>แผนก:</strong></td>
+                                <td>{{ job.department }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ผู้ขอ:</strong></td>
+                                <td>{{ job.requestor }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>วันที่ขอ:</strong></td>
+                                <td>{{ job.date_requested|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>วันที่ต้องการ:</strong></td>
+                                <td>{{ job.date_needed|date:"d/m/Y" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>ลำดับความสำคัญ:</strong></td>
+                                <td>
+                                    {% if job.priority == 'urgent' %}
+                                        <span class="badge bg-danger">เร่งด่วน</span>
+                                    {% elif job.priority == 'high' %}
+                                        <span class="badge bg-warning">สูง</span>
+                                    {% elif job.priority == 'normal' %}
+                                        <span class="badge bg-info">ปกติ</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">ต่ำ</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>เวลาพิมพ์:</strong></td>
+                                <td>{{ job.print_time_hours }} ชั่วโมง</td>
+                            </tr>
+                            <tr>
+                                <td><strong>น้ำหนักวัสดุ:</strong></td>
+                                <td>{{ job.material_weight_grams }} กรัม</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ชนิดวัสดุ:</strong></td>
+                                <td>{{ job.material_type }}</td>
+                            </tr>
+                            {% if job.file_upload %}
+                            <tr>
+                                <td><strong>ไฟล์:</strong></td>
+                                <td><a href="{{ job.file_upload.url }}" target="_blank">ดาวน์โหลด</a></td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+
+                {% if job.description %}
+                <div class="mt-3">
+                    <strong>รายละเอียด:</strong>
+                    <p>{{ job.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- การคำนวณต้นทุน -->
+        {% if job.total_cost %}
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-calculator"></i> การคำนวณต้นทุน</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table table-sm">
+                            <tr>
+                                <td>ค่าวัสดุ:</td>
+                                <td>{{ job.material_weight_grams }} กรัม × ฿{{ job.material_cost_per_gram }}</td>
+                                <td class="text-end">฿{{ job.material_cost|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>ค่าไฟ:</td>
+                                <td>{{ job.print_time_hours }} ชม. × ฿{{ job.electricity_cost_per_hour }}</td>
+                                <td class="text-end">฿{{ job.electricity_cost|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>ค่าแรง:</td>
+                                <td>{{ job.print_time_hours }} ชม. × ฿{{ job.labor_cost_per_hour }}</td>
+                                <td class="text-end">฿{{ job.labor_cost|floatformat:2 }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h4 class="text-success">ต้นทุนรวม: ฿{{ job.total_cost|floatformat:2 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- สถานะและการจัดการ -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>สถานะงาน</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>สถานะปัจจุบัน:</strong><br>
+                    {% if job.status == 'pending' %}
+                        <span class="badge bg-warning fs-6">รอดำเนินการ</span>
+                    {% elif job.status == 'printing' %}
+                        <span class="badge bg-primary fs-6">กำลังพิมพ์</span>
+                    {% elif job.status == 'completed' %}
+                        <span class="badge bg-success fs-6">เสร็จสิ้น</span>
+                    {% elif job.status == 'cancelled' %}
+                        <span class="badge bg-danger fs-6">ยกเลิก</span>
+                    {% endif %}
+                </div>
+
+                {% if job.date_started %}
+                <div class="mb-3">
+                    <strong>เริ่มพิมพ์:</strong><br>
+                    {{ job.date_started|date:"d/m/Y H:i" }}
+                </div>
+                {% endif %}
+
+                {% if job.date_completed %}
+                <div class="mb-3">
+                    <strong>เสร็จสิ้น:</strong><br>
+                    {{ job.date_completed|date:"d/m/Y H:i" }}
+                </div>
+                {% endif %}
+
+                <!-- ปุ่มอัปเดตสถานะ -->
+                <form method="post" action="{% url 'update_status' job.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="status" class="form-label">เปลี่ยนสถานะ:</label>
+                        <select name="status" class="form-select">
+                            <option value="pending" {% if job.status == 'pending' %}selected{% endif %}>รอดำเนินการ</option>
+                            <option value="printing" {% if job.status == 'printing' %}selected{% endif %}>กำลังพิมพ์</option>
+                            <option value="completed" {% if job.status == 'completed' %}selected{% endif %}>เสร็จสิ้น</option>
+                            <option value="cancelled" {% if job.status == 'cancelled' %}selected{% endif %}>ยกเลิก</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-sync"></i> อัปเดตสถานะ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
